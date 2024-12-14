@@ -12,12 +12,15 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--output_path", type=str, required=true, help="output path for the model."
+    "--output_path",
+    type=str,
+    required=True,
+    help="output path for the model."
 )
 parser.add_argument(
     "--dataset_path",
     type=str,
-    required=true,
+    required=True,
     help="dataset path for training.",
 )
 args = parser.parse_args()
