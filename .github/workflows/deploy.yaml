@@ -52,11 +52,10 @@ jobs:
           context: .
           file: src/train/Dockerfile
           push: true
-          tags: |
-            linguerie-repository/${{ secrets.PROJECT_ID }}/training:latest
+          tags: us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:latest
           cache-from: |
-            type=registry,ref=linguerie-repository/${{ secrets.PROJECT_ID }}/training:buildcache
+            type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:buildcache
           cache-to: |
-            type=registry,ref=linguerie-repository/${{ secrets.PROJECT_ID }}/training:buildcache,mode=max
+            type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:buildcache,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
