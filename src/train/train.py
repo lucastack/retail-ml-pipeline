@@ -90,7 +90,7 @@ class LinguerieModel(nn.Module):
         return self.mlp(x)
 
 
-model = LinguerieModel(input_dim=774, hidden_dim=128)
+model = LinguerieModel(input_dim=775, hidden_dim=128)
 
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
