@@ -50,7 +50,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/train
+          file: src/train/Dockerfile
           push: true
           tags: |
             linguerie-repository/${{ secrets.PROJECT_ID }}/training:latest
