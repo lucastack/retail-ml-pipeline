@@ -52,7 +52,8 @@ jobs:
           context: .
           file: src/train/Dockerfile
           push: true
-          tags: us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:latest
+          tags: |
+            us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:latest
           cache-from: |
             type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:buildcache
           cache-to: |
