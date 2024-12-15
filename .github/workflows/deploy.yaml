@@ -46,7 +46,7 @@ jobs:
       - name: Authorize Docker push
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
-      - name: Build and Push Speaker Container
+      - name: Build and Push Training Container
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -58,5 +58,20 @@ jobs:
             type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:buildcache
           cache-to: |
             type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/training:buildcache,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+      
+      - name: Build and Push Serving Container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/serve/Dockerfile
+          push: true
+          tags: |
+            us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/serving:latest
+          cache-from: |
+            type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/serving:buildcache
+          cache-to: |
+            type=registry,ref=us-central1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/linguerie-repository/serving:buildcache,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
