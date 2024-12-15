@@ -13,10 +13,7 @@ from google.cloud import storage
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--output_path",
-    type=str,
-    required=True,
-    help="output path for the model."
+    "--output_path", type=str, required=True, help="output path for the model."
 )
 parser.add_argument(
     "--dataset_path",
