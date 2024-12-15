@@ -1,0 +1,5 @@
+*.csv
+*.json
+*.pdf
+__pycache__/
+*.pt
