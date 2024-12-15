@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import argparse
+from google.cloud import storage
 
 
 parser = argparse.ArgumentParser()
@@ -133,3 +134,17 @@ for epoch in range(epochs):
             count_batches += 1
     average_mape = total_mape / count_batches
     print(average_mape)
+
+
+torch.save(model.state_dict(), "model.pt")
+
+
+def upload_to_gcs(local_path, gcs_uri):
+    storage_client = storage.Client()
+    bucket_name, blob_path = gcs_uri.replace("gs://", "").split("/", 1)
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(blob_path)
+    blob.upload_from_filename(local_path)
+
+
+upload_to_gcs("model.pt", args.output_path)
