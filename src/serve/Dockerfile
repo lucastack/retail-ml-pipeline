@@ -5,7 +5,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /app
 
-COPY src/serve/main.py /app/inference_server.py
+COPY src/serve/main.py /app/main.py
 
 
 EXPOSE 8080
