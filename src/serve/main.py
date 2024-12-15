@@ -24,7 +24,7 @@ def load_model():
     global model
     model_path = os.environ.get("AIP_STORAGE_URI", "/model")
     logging.info("Loading model artifacts from:", model_path)
-    logging.info(f"Artifacts: {os.listidr(model_path)}")
+    logging.info(f"Artifacts: {os.listdr(model_path)}")
     encoder_path = os.path.join(model_path, "brands_encoder.pkl")
     brands_encoder = joblib.load(encoder_path)
 
