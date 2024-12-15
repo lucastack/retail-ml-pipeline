@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import joblib
 from sentence_transformers import SentenceTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
@@ -9,6 +10,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import argparse
 from google.cloud import storage
+from linguerie_model import LinguerieModel
 
 
 parser = argparse.ArgumentParser()
@@ -28,11 +30,14 @@ df = pd.read_csv(args.dataset_path)
 embeddings_model = SentenceTransformer(
     "sentence-transformers/paraphrase-albert-small-v2"
 )
-text_embeddings = embeddings_model.encode(df["description"])
+descriptions_embeddings = embeddings_model.encode(df["description"])
+product_category_embeddings = embeddings_model.encode(df["product_category"])
 cat_features = df[["brand_name"]]
 encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
 cat_encoded = encoder.fit_transform(cat_features)
-X = np.hstack([text_embeddings, cat_encoded])
+X = np.hstack(
+    [descriptions_embeddings, product_category_embeddings, cat_encoded]
+)
 
 
 def standardize(data):
@@ -72,23 +77,7 @@ train_dataset = LingerieDataset(X_train_t, y_train_t)
 test_dataset = LingerieDataset(X_test_t, y_test_t)
 
 
-class LinguerieModel(nn.Module):
-    def __init__(self, input_dim, num_layers=5, hidden_dim=128):
-        super().__init__()
-        layers = []
-        prev_dim = input_dim
-        for i in range(num_layers):
-            layers.append(nn.Linear(prev_dim, hidden_dim))
-            layers.append(nn.ReLU())
-            prev_dim = hidden_dim
-        layers.append(nn.Linear(prev_dim, 1))
-        self.mlp = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.mlp(x)
-
-
-model = LinguerieModel(input_dim=775, hidden_dim=128)
+model = LinguerieModel(input_dim=X.shape[1], hidden_dim=128)
 
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
@@ -134,6 +123,7 @@ for epoch in range(epochs):
 
 
 torch.save(model.state_dict(), "model.pt")
+joblib.dump(encoder, "brands_encoder.pkl")
 
 
 def upload_to_gcs(local_path, gcs_uri):
@@ -144,4 +134,8 @@ def upload_to_gcs(local_path, gcs_uri):
     blob.upload_from_filename(local_path)
 
 
-upload_to_gcs("model.pt", args.output_path)
+if "gs://" in args.output_path:
+    upload_to_gcs("model.pt", args.output_path + "/model.pt")
+    upload_to_gcs(
+        "brands_encoder.pkl", args.output_path + "/brands_encoder.pkl"
+    )
