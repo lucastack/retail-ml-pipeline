@@ -76,7 +76,12 @@ def load_model():
     )
 
 
-@app.post("/predict")
+@app.get(os.environ['AIP_HEALTH_ROUTE'], status_code=200)
+def health():
+    return {}
+
+
+@app.post(os.environ['AIP_PREDICT_ROUTE'])
 def predict(request: PredictRequest):
     global session
     if session is None:
