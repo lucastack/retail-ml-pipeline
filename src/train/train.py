@@ -77,7 +77,9 @@ train_dataset = LingerieDataset(X_train_t, y_train_t)
 test_dataset = LingerieDataset(X_test_t, y_test_t)
 
 
-model = LinguerieModel(input_dim=X.shape[1], hidden_dim=128)
+model = LinguerieModel(
+    input_dim=X.shape[1], mean=mean_y, std=std_y, hidden_dim=128
+)
 
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
@@ -122,7 +124,7 @@ for epoch in range(epochs):
     print(average_mape)
 
 
-torch.save(model.state_dict(), "model.pt")
+torch.save(model, "model.pt")
 joblib.dump(encoder, "brands_encoder.pkl")
 
 
