@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from typing import List
 from sentence_transformers import SentenceTransformer
 import torch
-import logging
 import pandas as pd
 import numpy as np
 
@@ -61,10 +60,10 @@ def load_model():
     model_path = os.environ.get("AIP_STORAGE_URI", "model")
     if "gs://" in model_path:
         setup_artifacts(model_path)
-    logging.info("Loading model artifacts from:", model_path)
-    encoder_path = os.path.join(model_path, "brands_encoder.pkl")
+    print("Loading model artifacts from:", model_path)
+    encoder_path = os.path.join("model", "brands_encoder.pkl")
     brands_encoder = joblib.load(encoder_path)
-    linguerie_model_path = os.path.join(model_path, "model.pt")
+    linguerie_model_path = os.path.join("model", "model.pt")
     model = torch.load(linguerie_model_path)
     model.eval()
     embeddings_model = SentenceTransformer(
