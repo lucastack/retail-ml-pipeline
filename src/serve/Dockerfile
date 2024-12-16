@@ -4,7 +4,7 @@ COPY src/serve/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /app
-RUN mkdir /app/model
+RUN mkdir -p /app/model
 
 COPY src/serve/main.py /app/main.py
 
