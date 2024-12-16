@@ -7,6 +7,7 @@ WORKDIR /app
 RUN mkdir -p /app/model
 
 COPY src/serve/main.py /app/main.py
+COPY src/serve/linguerie_model.py /app/linguerie_model.py
 
 
 EXPOSE 8080
