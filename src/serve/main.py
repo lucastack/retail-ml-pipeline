@@ -1,5 +1,6 @@
 import os
 import joblib
+from google.cloud import storage
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
@@ -33,12 +34,34 @@ class InferenceSession:
         self.embeddings_model = embeddings_model
 
 
+def download_blob(bucket_name, source_blob_name, destination_file_name):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(source_blob_name)
+    blob.download_to_filename(destination_file_name)
+    print(f"Blob {source_blob_name} downloaded to {destination_file_name}.")
+
+
+def setup_artifacts(artifacts_uri):
+    path_parts = artifacts_uri.replace("gs://", "").split("/")
+    bucket_name = path_parts[0]
+    artifacts_path = "/".join(path_parts[1:])
+
+    files_to_download = ["brands_encoder.pkl", "model.pt"]
+    for file_name in files_to_download:
+        local_file_path = f"model/{file_name}"
+        blob_name = f"{artifacts_path}/{file_name}"
+        download_blob(bucket_name, blob_name, local_file_path)
+    return
+
+
 @app.on_event("startup")
 def load_model():
     global session
     model_path = os.environ.get("AIP_STORAGE_URI", "model")
+    if "gs://" in model_path:
+        setup_artifacts(model_path)
     logging.info("Loading model artifacts from:", model_path)
-    logging.info(f"Artifacts: {os.listdir(model_path)}")
     encoder_path = os.path.join(model_path, "brands_encoder.pkl")
     brands_encoder = joblib.load(encoder_path)
     linguerie_model_path = os.path.join(model_path, "model.pt")
